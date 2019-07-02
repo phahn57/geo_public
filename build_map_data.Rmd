@@ -1,0 +1,34 @@
+---
+title: "build_map"
+author: "Peter Hahn"
+date: "2 7 2019"
+output: html_document
+---
+
+#### Don't run, only for demonstratioin , data "fall" is missing due to non-disclosure
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sp)
+library(geojsonio)
+library(leaflet)
+library(geojsonsf)
+```
+
+### download plz-5stellig from:
+https://www.suche-postleitzahl.org/plz-karte-erstellen
+
+### This is part of the creation of map stored in y_prev and y_akt
+
+```{r}
+#### load map with geojson_sf 
+germany <- geojson_sf("../data/plz-5stellig.geojson")
+## filter data ( patients grouped by departement and zipcode), count and cast.
+
+xx <- fall %>% filter(jahr==2019) %>% filter(form=="voll"|form=="ambulantes operieren" ) %>% group_by(abt,plz) %>% tally() %>% filter(abt != "EXT") %>% filter(abt != "RA") 
+map_19 <- xx %>% dcast(plz~abt,value.var="n") %>% mutate_all(funs(ifelse(is.na(.),0,.)))
+Add casted dataframe to the map
+
+map_data <- merge(germany,map_19)
+```
+
