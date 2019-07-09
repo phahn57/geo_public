@@ -12,6 +12,9 @@ library(grid)
 library(gridExtra)
 library(kableExtra)
 library(leaflet)
+library(sf)
+library(geojsonio)
+library(geojsonsf)
 
 
 ## Funktionen
@@ -26,7 +29,7 @@ load("y_akt.RData")
 brk <- seq.int(1,12,1)
 ## Color Palette für Ar-DB
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#0033FF")
-
+bins =  c(1,5,10,15,20,50,100,150,180)
 
 
 # Define UI ----
@@ -47,7 +50,7 @@ ui <- dashboardPage(
                 tabItems(
                         
                 tabItem(tabName = "kart",
-                         h4("Einzugsbereich stationärer, AOP Fälle"),
+                         h4("Einzugsbereich stationärer und AOP Fälle.", "Daten entsprechen nicht den Real-Daten"),
                         fluidRow( 
                         column(width=10,
                           leafletOutput("mapping",height=1000)
@@ -77,18 +80,26 @@ server <- function(input, output) {
                  y_data()$map %>% select(plz,geometry,input$inVar7) %>% rename(number=input$inVar7)
         })
         
+        ## observer with leafletProxy
+        
+        observe({
+          selectedmap()
+          pal <- colorBin("PiYG", domain=selectedmap()$number, bins = bins)
+          leafletProxy("mapping", data= selectedmap())  %>% 
+            clearShapes() %>%
+            clearControls() %>% 
+            addPolygons(
+              fillColor = ~pal(number),
+              weight = 2,
+              opacity= 1,
+              color="white",
+              dashArray = "1",
+              fillOpacity = 0.4)  %>% addLegend(pal = pal,values=~density, opacity=0.9, title=NULL)
+        })
         
 ### Tab karte
-        output$mapping <- renderLeaflet({m <- leaflet(selectedmap()) %>% setView(9.0807,49.2244, zoom=10) 
-        bins = c(1,5,10,15,20,50,100,150,180)
-        pal <- colorBin("BrBG", domain=selectedmap()$number, bins = bins)
-        m %>% addPolygons(
-                fillColor = ~pal(number),
-                weight = 2,
-                opacity= 1,
-                color="white",
-                dashArray = "1",
-                fillOpacity = 0.4) %>% addTiles() %>% addLegend(pal=pal,values=~density, opacity=0.9, title=NULL) 
+        output$mapping <- renderLeaflet({leaflet() %>% setView(9.0807,49.2244, zoom=10) %>% 
+            addTiles()
         })
 }
 
