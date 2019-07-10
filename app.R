@@ -29,7 +29,7 @@ load("y_akt.RData")
 brk <- seq.int(1,12,1)
 ## Color Palette für Ar-DB
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#0033FF")
-bins =  c(1,5,10,15,20,50,100,150,180)
+bins =  c(1,2,4,8,16,32,64,128,256)
 
 
 # Define UI ----
