@@ -77,14 +77,15 @@ server <- function(input, output) {
         
       
         selectedmap <- reactive({
-                 y_data()$map %>% select(plz,geometry,input$inVar7) %>% rename(number=input$inVar7)
+                 y_data()$map %>% select(note,plz,geometry,input$inVar7) %>% rename(number=input$inVar7)
         })
         
         ## observer with leafletProxy
         
         observe({
           selectedmap()
-          pal <- colorBin("PiYG", domain=selectedmap()$number, bins = bins)
+          pop_up <- paste0("Ort:",selectedmap()$note,"<br>Anzahl:",selectedmap()$number )
+          pal <- colorBin("plasma", domain=selectedmap()$number, bins = bins)
           leafletProxy("mapping", data= selectedmap())  %>% 
             clearShapes() %>%
             clearControls() %>% 
@@ -94,7 +95,7 @@ server <- function(input, output) {
               opacity= 1,
               color="white",
               dashArray = "1",
-              fillOpacity = 0.4)  %>% addLegend(pal = pal,values=~density, opacity=0.9, title=NULL)
+              fillOpacity = 0.5, popup=pop_up)  %>% addLegend(pal = pal,values=~density, opacity=0.9, title=NULL)
         })
         
 ### Tab karte
