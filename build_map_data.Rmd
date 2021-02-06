@@ -5,7 +5,7 @@ date: "2 7 2019"
 output: html_document
 ---
 
-#### Don't run, only for demonstratioin , data "fall" is missing due to non-disclosure
+#### Don't run, only for demonstration , data "fall" is missing due to non-disclosure
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
